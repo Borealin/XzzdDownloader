@@ -80,6 +80,18 @@ def download_file(s, url, file_name):
         f.close()
 
 
+def parse_content_command(s: str, index_max: int) -> list:
+    if s.isnumeric():
+        if int(s) < index_max:
+            return [int(s)]
+        else:
+            return []
+    if isinstance(eval(s), list):
+        return list(eval(s))
+    if s == 'all':
+        return list(range(index_max))
+
+
 if __name__ == "__main__":
     s = requests.session()
     user_school_id = input("input your zju school id\n")
@@ -93,18 +105,21 @@ if __name__ == "__main__":
     download_list = get_download_list(s, course_list[course_index][1])
     for index, course_ware in enumerate(download_list):
         print(index, course_ware)
-    course_ware_index = int(input("select course ware with index\n"))
-    dir_appendix = input("input download directory, default current directory\n")
+    course_ware_index = parse_content_command(
+        input("select course ware with index list\n"), len(download_list))
+    dir_appendix = input(
+        "input download directory, default current directory\n")
     file_name = ""
-    if not os.path.exists(dir_appendix):
-        print("directory not found")
-        print("download to ./{}".format(download_list[course_ware_index][0]))
-        file_name = "./"+download_list[course_ware_index][0]
-    else:
-        file_name = dir_appendix+"/"+download_list[course_ware_index][0]
-    try:
-        download_file(s, download_list[course_ware_index][1],
-                file_name)
-        print("download successful")
-    except:
-        print("download error")
+    for index in course_ware_index:
+        if not os.path.exists(dir_appendix):
+            print("directory not found")
+            print("download to ./{}".format(download_list[index][0]))
+            file_name = "./"+download_list[index][0]
+        else:
+            file_name = dir_appendix+"/"+download_list[index][0]
+        try:
+            download_file(s, download_list[index][1],
+                          file_name)
+            print("download successful")
+        except:
+            print("download error")

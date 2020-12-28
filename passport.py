@@ -1,5 +1,5 @@
 import os
-
+import sys
 import requests
 import json
 import rsaNoPadding
@@ -36,7 +36,7 @@ def login(s, userId, userPass):
 
 def getPass(s, filename):
     try:
-        with open('pass/' + filename, "rb") as json_file:
+        with open(os.path.split( os.path.realpath( sys.argv[0] ) )[0]+'/pass/' + filename, "rb") as json_file:
             userPass = json_file.read().decode()
             login(s, filename, userPass)
     except IOError:
@@ -51,14 +51,14 @@ def getPass(s, filename):
                 print('wrong password')
             else:
                 flag = False
-        with open('pass/' + filename, "wb") as json_file:
+        with open(os.path.split( os.path.realpath( sys.argv[0] ) )[0]+'/pass/' + filename, "wb") as json_file:
             json_file.write(userPass.encode())
     return requests.utils.dict_from_cookiejar(s.cookies)
 
 
 if __name__ == '__main__':
-    if not os.path.exists('pass'):
-        os.mkdir('pass')
+    if not os.path.exists(os.path.split( os.path.realpath( sys.argv[0] ) )[0]+'/pass'):
+        os.mkdir(os.path.split( os.path.realpath( sys.argv[0] ) )[0]+'/pass')
     session = requests.session()
     stuId = str(input('please input stuId you want to add '))
     print(getPass(session, stuId))
